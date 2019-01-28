@@ -6,31 +6,31 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Entity(name = ContestDetail.TABLE_NAME)
-public class ContestDetail {
+@Entity(name = Contest.TABLE_NAME)
+public class Contest {
 
-    public static final String TABLE_NAME = "CONTEST_DETAIL";
+    public static final String TABLE_NAME = "CONTEST";
 
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name="uuid",strategy = "uuid2")
-    private String contestDetailId;
+    private String contestId;
 
     private String contestName;
     private String type;
     private Long startTime;
-    private String active;
+    private Boolean active;
 
     public static String getTableName() {
         return TABLE_NAME;
     }
 
-    public String getContestDetailId() {
-        return contestDetailId;
+    public String getContestId() {
+        return contestId;
     }
 
-    public void setContestDetailId(String contestDetailId) {
-        this.contestDetailId = contestDetailId;
+    public void setContestId(String contestId) {
+        this.contestId = contestId;
     }
 
     public String getContestName() {
@@ -57,11 +57,11 @@ public class ContestDetail {
         this.startTime = startTime;
     }
 
-    public String getActive() {
+    public Boolean getActive() {
         return active;
     }
 
-    public void setActive(String active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 }
