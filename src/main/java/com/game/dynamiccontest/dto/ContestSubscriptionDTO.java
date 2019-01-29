@@ -1,30 +1,14 @@
-package com.game.dynamiccontest.entity;
+package com.game.dynamiccontest.dto;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.game.dynamiccontest.entity.Contest;
 
-import javax.persistence.*;
-
-//@Entity(name = ContestSubscribe.TABLE_NAME)
-@Entity
-public class ContestSubscribe {
-
-//    public static final String TABLE_NAME="CONTEST_SUBSCRIBE";
-
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name="uuid",strategy = "uuid2")
+public class ContestSubscriptionDTO {
     private String contestSubscribeId;
 
     private String userId;
-    @ManyToOne
-    @JoinColumn(name = "contest_id")
     private Contest contest;
     private Boolean finished;
     private Double score;
-
-//    public static String getTableName() {
-//        return TABLE_NAME;
-//    }
 
     public String getContestSubscribeId() {
         return contestSubscribeId;
