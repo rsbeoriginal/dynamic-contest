@@ -1,10 +1,19 @@
 package com.game.dynamiccontest.controller;
 
+import com.game.dynamiccontest.dto.*;
+import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.job.SendNotification;
+import com.game.dynamiccontest.services.ContestService;
+import com.game.dynamiccontest.utils.FailException;
+import com.game.dynamiccontest.utils.ResponseConstants;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/contests")
