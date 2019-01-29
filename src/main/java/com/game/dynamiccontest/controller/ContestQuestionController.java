@@ -78,7 +78,7 @@ public class ContestQuestionController {
 
         if(verifyUser(requestDTO.getUserId())) {
             ContestQuestionDTO contestQuestionDTO = requestDTO.getRequest();
-            if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
+            if(contestService.getContestById(contestId) != null && contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
                 if (contestQuestionDTO.getContest() == null)
                     contestQuestionDTO.setContest(contestService.getContestById(contestId));
                 ContestQuestion contestQuestion = new ContestQuestion();
