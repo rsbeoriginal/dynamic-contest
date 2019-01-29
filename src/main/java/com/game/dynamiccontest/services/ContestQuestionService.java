@@ -1,5 +1,6 @@
 package com.game.dynamiccontest.services;
 
+import com.game.dynamiccontest.dto.QuestionDetailDTO;
 import com.game.dynamiccontest.entity.ContestQuestion;
 
 import java.util.List;
@@ -10,4 +11,6 @@ public interface ContestQuestionService {
     ContestQuestion getContestQuestionById(String contestId, String questionId);
     int getNextQuestionNumber(String contestId);
     void deleteContestQuestionByContestId(String contestId);
+
+    void sendQuestionToFirebaseDatabase(String contestId, String questionSequence, QuestionDetailDTO questionDetailDTO);
 }

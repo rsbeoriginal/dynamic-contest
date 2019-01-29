@@ -1,8 +1,6 @@
 package com.game.dynamiccontest.controller;
 
-import com.game.dynamiccontest.dto.ContestQuestionDTO;
-import com.game.dynamiccontest.dto.RequestDTO;
-import com.game.dynamiccontest.dto.ResponseDTO;
+import com.game.dynamiccontest.dto.*;
 import com.game.dynamiccontest.entity.ContestQuestion;
 import com.game.dynamiccontest.services.ContestQuestionService;
 import com.game.dynamiccontest.services.ContestService;
@@ -88,6 +86,22 @@ public class ContestQuestionController {
                     contestQuestion.setQuestionSequence(questionSequence + 1);
                     ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
                     BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
+
+                    //TODO:DUMMY DATA
+                    QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
+                    questionDetailDTO.setQuestionId(""+contestQuestion.getQuestionSequence());
+                    OptionDTO optionDTO = new OptionDTO();
+                    optionDTO.setOptionContent("OPTION VALUE ");
+                    List<OptionDTO> optionDTOList = new ArrayList<>();
+                    optionDTOList.add(optionDTO);
+                    optionDTOList.add(optionDTO);
+                    optionDTOList.add(optionDTO);
+                    optionDTOList.add(optionDTO);
+                    questionDetailDTO.setOptionDTOList(optionDTOList);
+                    questionDetailDTO.setName("WHat is this");
+                    questionDetailDTO.setContent("this is actual questions");
+                    //TODO:REMOVE CODE
+                    contestQuestionService.sendQuestionToFirebaseDatabase(contestId,""+contestQuestion.getQuestionSequence(),questionDetailDTO);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
