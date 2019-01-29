@@ -4,10 +4,11 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
-@Entity(name = ContestQuestion.TABLE_NAME)
+//@Entity(name = ContestQuestion.TABLE_NAME)
+@Entity
 public class ContestQuestion {
 
-    public static final String TABLE_NAME="CONTEST_QUESTION";
+//    public static final String TABLE_NAME="CONTEST_QUESTION";
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -72,7 +73,7 @@ public class ContestQuestion {
         isLast = last;
     }
 
-    public static String getTableName() {
-        return TABLE_NAME;
-    }
+//    public static String getTableName() {
+//        return TABLE_NAME;
+//    }
 }

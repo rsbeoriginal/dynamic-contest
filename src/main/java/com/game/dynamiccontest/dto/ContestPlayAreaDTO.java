@@ -1,20 +1,7 @@
-package com.game.dynamiccontest.entity;
+package com.game.dynamiccontest.dto;
 
-import org.hibernate.annotations.GenericGenerator;
+public class ContestPlayAreaDTO {
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-//@Entity(name = ContestPlayArea.TABLE_NAME)
-@Entity
-public class ContestPlayArea {
-
-//    public static final String TABLE_NAME="CONTEST_PLAY_AREA";
-
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name="uuid",strategy = "uuid2")
     private String contestPlayAreaId;
 
     private String userId;
@@ -25,10 +12,6 @@ public class ContestPlayArea {
     private Long endTime;
     private String answer;
     private Double score;
-
-//    public static String getTableName() {
-//        return TABLE_NAME;
-//    }
 
     public String getContestPlayAreaId() {
         return contestPlayAreaId;
