@@ -31,6 +31,7 @@ public class ContestQuestionController {
         ResponseDTO<List<ContestQuestionDTO>> responseDTO = new ResponseDTO<>();
 
         if(verifyUser(requestDTO.getUserId())) {
+            boolean transactionSuccess = true;
             List<ContestQuestionDTO> contestQuestionDTOList = new ArrayList<>();
             for (ContestQuestionDTO contestQuestionDTO : requestDTO.getRequest()) {
                 if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
@@ -48,13 +49,18 @@ public class ContestQuestionController {
                         e.printStackTrace();
                     }
                 }
+                else {
+                    contestQuestionService.deleteContestQuestionByContestId(contestId);
+                    transactionSuccess = false;
+                    break;
+                }
             }
-            try {
+            if(transactionSuccess) {
                 responseDTO.setStatus(ResponseConstants.SUCCESS);
                 responseDTO.setResponse(contestQuestionDTOList);
             }
-            catch (Exception e) {
-                responseDTO.setStatus(ResponseConstants.ERROR);
+            else{
+                responseDTO.setStatus(ResponseConstants.FAIL);
                 responseDTO.setErrorMessage("Error while adding questions");
             }
         }

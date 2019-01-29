@@ -9,4 +9,5 @@ public interface ContestQuestionService {
     List<ContestQuestion> getAllQuestions(String contestId);
     ContestQuestion getContestQuestionById(String contestId, String questionId);
     int getNextQuestionNumber(String contestId);
+    void deleteContestQuestionByContestId(String contestId);
 }

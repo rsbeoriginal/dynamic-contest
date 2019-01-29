@@ -38,4 +38,10 @@ public class ContestQuestionServiceImpl implements ContestQuestionService {
         return contestQuestionRepository.findNextQuestionNumber(contestId);
 //        return 0;
     }
+
+    @Override
+    @Transactional(readOnly = false)
+    public void deleteContestQuestionByContestId(String contestId) {
+        contestQuestionRepository.deleteContestQuestionByContest_ContestId(contestId);
+    }
 }
