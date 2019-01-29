@@ -2,7 +2,9 @@ package com.game.dynamiccontest.services.impl;
 
 import com.game.dynamiccontest.dto.ContestPlayAreaDTO;
 import com.game.dynamiccontest.dto.QuestionDetailDTO;
+import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.entity.ContestPlayArea;
+import com.game.dynamiccontest.entity.ContestSubscribe;
 import com.game.dynamiccontest.repository.ContestPlayAreaRepository;
 import com.game.dynamiccontest.repository.ContestQuestionRepository;
 import com.game.dynamiccontest.repository.ContestSubscribeRepository;
@@ -59,11 +61,37 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
 
             contestPlayArea.setScore(checkAnswer(contestPlayAreaDTO.getAnswer()));
             contestPlayAreaRepository.save(contestPlayArea);
+
+            //for last question
+            if(checkLastQuestion()){
+                finishContest(contestPlayAreaDTO.getContestId(),contestPlayArea.getUserId());
+            }
+
         }else{
             throw new FailException("Already answered");
         }
 
 
+    }
+
+    private boolean checkLastQuestion() {
+        return false;
+    }
+
+    @Override
+    public void finishContest(String contestId, String userId) {
+        Double totalScore = contestPlayAreaRepository.getTotalScorebyContest(contestId,userId);
+        ContestSubscribe contestSubscribe = contestSubscribeRepository.getContestbyUserId(contestId,userId);
+        if(contestSubscribe ==null){
+            contestSubscribe = new ContestSubscribe();
+            Contest contest = new Contest();
+            contest.setContestId(contestId);
+            contestSubscribe.setContest(contest);
+            contestSubscribe.setUserId(userId);
+        }
+        contestSubscribe.setScore(totalScore);
+        contestSubscribe.setFinished(true);
+        contestSubscribeRepository.save(contestSubscribe);
     }
 
     //TODO:CHECK CORRECT ANSWER

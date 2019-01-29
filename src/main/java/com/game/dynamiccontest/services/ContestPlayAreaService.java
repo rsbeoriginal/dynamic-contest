@@ -6,5 +6,7 @@ import com.game.dynamiccontest.utils.FailException;
 
 public interface ContestPlayAreaService {
     void submitAnswer(ContestPlayAreaDTO request) throws FailException;
+
+    void finishContest(String contestId, String userId);
 //    QuestionDetailDTO getNextQuestion();
 }

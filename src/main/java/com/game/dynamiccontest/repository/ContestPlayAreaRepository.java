@@ -8,4 +8,7 @@ public interface ContestPlayAreaRepository extends CrudRepository<ContestPlayAre
 
     @Query("SELECT COUNT(*) FROM ContestPlayArea WHERE (contestId = ?1 AND userId = ?2 AND questionId = ?3 )")
     Integer checkAlreadyExists(String contestId, String userId, String questionId);
+
+    @Query("SELECT SUM(score) FROM ContestPlayArea WHERE (contestId = ?1 AND userId = ?2)")
+    Double getTotalScorebyContest(String contestId, String userId);
 }

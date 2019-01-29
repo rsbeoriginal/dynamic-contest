@@ -44,6 +44,16 @@ public class ContestPlayAreaController {
         return responseDTO;
     }
 
+    @PostMapping("/finish")
+    public ResponseDTO<String> finish(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<String> requestDTO){
+        ResponseDTO<String> responseDTO = new ResponseDTO<>();
+        if(verifyUser(requestDTO.getUserId())){
+            contestPlayAreaService.finishContest(contestId,requestDTO.getUserId());
+        }
+        return responseDTO;
+    }
+
+
     private boolean verifyUser(String userId) {
         return true;
     }
