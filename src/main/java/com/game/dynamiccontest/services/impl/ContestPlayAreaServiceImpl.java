@@ -4,6 +4,7 @@ import com.game.dynamiccontest.dto.ContestPlayAreaDTO;
 import com.game.dynamiccontest.dto.QuestionDetailDTO;
 import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.entity.ContestPlayArea;
+import com.game.dynamiccontest.entity.ContestQuestion;
 import com.game.dynamiccontest.entity.ContestSubscribe;
 import com.game.dynamiccontest.repository.ContestPlayAreaRepository;
 import com.game.dynamiccontest.repository.ContestQuestionRepository;
@@ -63,7 +64,7 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
             contestPlayAreaRepository.save(contestPlayArea);
 
             //for last question
-            if(checkLastQuestion()){
+            if(checkLastQuestion(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getQuestionId())){
                 finishContest(contestPlayAreaDTO.getContestId(),contestPlayArea.getUserId());
             }
 
@@ -74,7 +75,11 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
 
     }
 
-    private boolean checkLastQuestion() {
+    private boolean checkLastQuestion(String contestId, String questionId) {
+        ContestQuestion contestQuestion = contestQuestionRepository.findContestQuestionByContest_ContestIdAndQuestionId(contestId,questionId);
+        if(null != contestQuestion && contestQuestion.getLast() == true){
+            return true;
+        }
         return false;
     }
 
@@ -92,6 +97,7 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
         contestSubscribe.setScore(totalScore);
         contestSubscribe.setFinished(true);
         contestSubscribeRepository.save(contestSubscribe);
+        System.out.println("score: " + totalScore);
     }
 
     //TODO:CHECK CORRECT ANSWER

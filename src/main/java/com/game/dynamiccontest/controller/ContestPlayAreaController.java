@@ -48,7 +48,16 @@ public class ContestPlayAreaController {
     public ResponseDTO<String> finish(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<String> requestDTO){
         ResponseDTO<String> responseDTO = new ResponseDTO<>();
         if(verifyUser(requestDTO.getUserId())){
-            contestPlayAreaService.finishContest(contestId,requestDTO.getUserId());
+            try {
+                contestPlayAreaService.finishContest(contestId,requestDTO.getUserId());
+                responseDTO.setStatus(ResponseConstants.SUCCESS);
+            }catch (Exception e){
+                responseDTO.setStatus(ResponseConstants.ERROR);
+                responseDTO.setResponse(e.getMessage());
+            }
+        }else{
+            responseDTO.setStatus(ResponseConstants.FAIL);
+            responseDTO.setResponse("Auth fail");
         }
         return responseDTO;
     }

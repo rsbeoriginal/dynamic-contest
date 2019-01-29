@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/contests")
 public class ContestController {
 
-    @RequestMapping(value = "/createContest")
+    @GetMapping(value = "/createContest")
     public void createContest(){
         try{
             String cron = "0/10 * 12 * * ? *";

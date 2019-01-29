@@ -14,10 +14,12 @@ public interface ContestQuestionRepository extends CrudRepository<ContestQuestio
 
     @Query("SELECT startTime FROM ContestQuestion WHERE (contest_id = ?1 AND questionId = ?2)")
     Long getStartTimeByQuestion(String contestId, String questionId);
+
     List<ContestQuestion> findContestQuestionByContest_ContestId(String contestId);
+
     ContestQuestion findContestQuestionByContest_ContestIdAndQuestionId(String contestId, String questionId);
 
-    @Query("SELECT COALESCE(MAX(cq.questionSequence),0) FROM CONTEST_QUESTION cq WHERE cq.contest.contestId=?1")
+    @Query("SELECT COALESCE(MAX(cq.questionSequence),0) FROM ContestQuestion cq WHERE cq.contest.contestId=?1")
     int findNextQuestionNumber(String contestId);
 
 //    @Modifying
