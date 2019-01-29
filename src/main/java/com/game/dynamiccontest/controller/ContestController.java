@@ -1,13 +1,13 @@
 package com.game.dynamiccontest.controller;
 
-import com.game.dynamiccontest.dto.ContestDTO;
-import com.game.dynamiccontest.dto.RequestDTO;
-import com.game.dynamiccontest.dto.ResponseDTO;
-import com.game.dynamiccontest.dto.ResponseListDTO;
+import com.game.dynamiccontest.dto.*;
 import com.game.dynamiccontest.entity.Contest;
+import com.game.dynamiccontest.job.SendNotification;
 import com.game.dynamiccontest.services.ContestService;
 import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +18,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/contests")
 public class ContestController {
+
+    @RequestMapping(value = "/createContest")
+    public void createContest(){
+        try{
+            String cron = "0/10 * 12 * * ? *";
+            JobDetail job = JobBuilder.newJob(SendNotification.class).build();
+            Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.start();
+            scheduler.scheduleJob(job, trigger);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Autowired
     ContestService contestService;
