@@ -11,4 +11,6 @@ public interface ContestService {
     List<Contest> getAll() throws Exception;
 
     Contest getContestById(String contestId);
+
+    void sendContestScheduleNotification(long timestamp);
 }

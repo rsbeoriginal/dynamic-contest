@@ -19,19 +19,19 @@ import java.util.List;
 @RequestMapping("/contests")
 public class ContestController {
 
-    @RequestMapping(value = "/createContest")
-    public void createContest(){
-        try{
-            String cron = "0/10 * 12 * * ? *";
-            JobDetail job = JobBuilder.newJob(SendNotification.class).build();
-            Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
-            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.start();
-            scheduler.scheduleJob(job, trigger);
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-    }
+//    @RequestMapping(value = "/createContest")
+//    public void createContest(){
+//        try{
+//            String cron = "0/10 55 19 * * ? *";
+//            JobDetail job = JobBuilder.newJob(SendNotification.class).build();
+//            Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+//            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+//            scheduler.start();
+//            scheduler.scheduleJob(job, trigger);
+//        } catch (SchedulerException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Autowired
     ContestService contestService;
@@ -48,6 +48,10 @@ public class ContestController {
                 BeanUtils.copyProperties(contestService.add(contest), contestDTO);
                 responseDTO.setStatus(ResponseConstants.SUCCESS);
                 responseDTO.setResponse(contestDTO);
+
+                //Schedule Notification
+                contestService.sendContestScheduleNotification(responseDTO.getResponse().getStartTime() - 1*60*1000);
+
             } catch (FailException e) {
                 responseDTO.setStatus(ResponseConstants.FAIL);
                 responseDTO.setErrorMessage(e.getMessage());
