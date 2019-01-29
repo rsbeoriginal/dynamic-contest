@@ -25,39 +25,74 @@ public class ContestQuestionController {
     @Autowired
     ContestService contestService;
 
-    @PostMapping("/")
-    public ResponseDTO<List<ContestQuestionDTO>> addQuestions(@RequestBody RequestDTO<List<ContestQuestionDTO>> requestDTO, @PathVariable("contestId") String contestId){
+//    @PostMapping("/")
+//    public ResponseDTO<List<ContestQuestionDTO>> addQuestions(@RequestBody RequestDTO<List<ContestQuestionDTO>> requestDTO, @PathVariable("contestId") String contestId){
+//
+//        ResponseDTO<List<ContestQuestionDTO>> responseDTO = new ResponseDTO<>();
+//
+//        if(verifyUser(requestDTO.getUserId())) {
+//            boolean transactionSuccess = true;
+//            List<ContestQuestionDTO> contestQuestionDTOList = new ArrayList<>();
+//            for (ContestQuestionDTO contestQuestionDTO : requestDTO.getRequest()) {
+//                if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
+//                    if (contestQuestionDTO.getContest() == null)
+//                        contestQuestionDTO.setContest(contestService.getContestById(contestId));
+//                    ContestQuestion contestQuestion = new ContestQuestion();
+//                    BeanUtils.copyProperties(contestQuestionDTO, contestQuestion);
+//                    try {
+//                        int questionSequence=contestQuestionService.getNextQuestionNumber(contestId);
+//                        contestQuestion.setQuestionSequence(questionSequence+1);
+//                        ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
+//                        BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
+//                        contestQuestionDTOList.add(contestQuestionDTO1);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                else {
+//                    contestQuestionService.deleteContestQuestionByContestId(contestId);
+//                    transactionSuccess = false;
+//                    break;
+//                }
+//            }
+//            if(transactionSuccess) {
+//                responseDTO.setStatus(ResponseConstants.SUCCESS);
+//                responseDTO.setResponse(contestQuestionDTOList);
+//            }
+//            else{
+//                responseDTO.setStatus(ResponseConstants.FAIL);
+//                responseDTO.setErrorMessage("Error while adding questions");
+//            }
+//        }
+//        else{
+//            responseDTO.setStatus(ResponseConstants.FAIL);
+//            responseDTO.setErrorMessage("Auth Failed");
+//        }
+//        return responseDTO;
+//    }
 
-        ResponseDTO<List<ContestQuestionDTO>> responseDTO = new ResponseDTO<>();
+    @PostMapping("/")
+    public ResponseDTO<ContestQuestionDTO> addQuestion(@RequestBody RequestDTO<ContestQuestionDTO> requestDTO, @PathVariable("contestId") String contestId){
+
+        ResponseDTO<ContestQuestionDTO> responseDTO = new ResponseDTO<>();
 
         if(verifyUser(requestDTO.getUserId())) {
-            boolean transactionSuccess = true;
-            List<ContestQuestionDTO> contestQuestionDTOList = new ArrayList<>();
-            for (ContestQuestionDTO contestQuestionDTO : requestDTO.getRequest()) {
-                if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
-                    if (contestQuestionDTO.getContest() == null)
-                        contestQuestionDTO.setContest(contestService.getContestById(contestId));
-                    ContestQuestion contestQuestion = new ContestQuestion();
-                    BeanUtils.copyProperties(contestQuestionDTO, contestQuestion);
-                    try {
-                        int questionSequence=contestQuestionService.getNextQuestionNumber(contestId);
-                        contestQuestion.setQuestionSequence(questionSequence+1);
-                        ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
-                        BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
-                        contestQuestionDTOList.add(contestQuestionDTO1);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            ContestQuestionDTO contestQuestionDTO = requestDTO.getRequest();
+            if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
+                if (contestQuestionDTO.getContest() == null)
+                    contestQuestionDTO.setContest(contestService.getContestById(contestId));
+                ContestQuestion contestQuestion = new ContestQuestion();
+                BeanUtils.copyProperties(contestQuestionDTO, contestQuestion);
+                try {
+                    int questionSequence = contestQuestionService.getNextQuestionNumber(contestId);
+                    contestQuestion.setQuestionSequence(questionSequence + 1);
+                    ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
+                    BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                else {
-                    contestQuestionService.deleteContestQuestionByContestId(contestId);
-                    transactionSuccess = false;
-                    break;
-                }
-            }
-            if(transactionSuccess) {
                 responseDTO.setStatus(ResponseConstants.SUCCESS);
-                responseDTO.setResponse(contestQuestionDTOList);
+                responseDTO.setResponse(contestQuestionDTO);
             }
             else{
                 responseDTO.setStatus(ResponseConstants.FAIL);
