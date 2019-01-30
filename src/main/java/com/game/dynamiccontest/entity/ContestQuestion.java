@@ -76,4 +76,17 @@ public class ContestQuestion {
 //    public static String getTableName() {
 //        return TABLE_NAME;
 //    }
+
+
+    @Override
+    public String toString() {
+        return "ContestQuestion{" +
+                "contestQuestionId='" + contestQuestionId + '\'' +
+                ", contest=" + contest +
+                ", questionId='" + questionId + '\'' +
+                ", questionSequence=" + questionSequence +
+                ", startTime=" + startTime +
+                ", isLast=" + isLast +
+                '}';
+    }
 }

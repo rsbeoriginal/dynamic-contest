@@ -28,4 +28,13 @@ public class OptionDTO {
     public void setOptionContent(String optionContent) {
         this.optionContent = optionContent;
     }
+
+    @Override
+    public String toString() {
+        return "OptionDTO{" +
+                "questionId='" + questionId + '\'' +
+                ", optionId='" + optionId + '\'' +
+                ", optionContent='" + optionContent + '\'' +
+                '}';
+    }
 }

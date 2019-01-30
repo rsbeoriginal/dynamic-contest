@@ -94,4 +94,19 @@ public class QuestionDetailDTO {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+
+    @Override
+    public String toString() {
+        return "QuestionDetailDTO{" +
+                "questionId='" + questionId + '\'' +
+                ", questionName='" + questionName + '\'' +
+                ", questionContent='" + questionContent + '\'' +
+                ", optionDTOList=" + optionDTOList +
+                ", questionCategory='" + questionCategory + '\'' +
+                ", questionType='" + questionType + '\'' +
+                ", answerType='" + answerType + '\'' +
+                ", questionDifficulty='" + questionDifficulty + '\'' +
+                ", duration=" + duration +
+                '}';
+    }
 }

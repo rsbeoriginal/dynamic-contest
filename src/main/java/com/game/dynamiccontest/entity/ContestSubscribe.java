@@ -65,4 +65,15 @@ public class ContestSubscribe {
     public void setScore(Double score) {
         this.score = score;
     }
+
+    @Override
+    public String toString() {
+        return "ContestSubscribe{" +
+                "contestSubscribeId='" + contestSubscribeId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", contest=" + contest +
+                ", finished=" + finished +
+                ", score=" + score +
+                '}';
+    }
 }

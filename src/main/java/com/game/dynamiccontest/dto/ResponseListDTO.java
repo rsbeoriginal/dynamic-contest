@@ -30,4 +30,13 @@ public class ResponseListDTO<T> {
     public void setResponse(List<T> response) {
         this.response = response;
     }
+
+    @Override
+    public String toString() {
+        return "ResponseListDTO{" +
+                "status='" + status + '\'' +
+                ", errorMessage='" + errorMessage + '\'' +
+                ", response=" + response +
+                '}';
+    }
 }
