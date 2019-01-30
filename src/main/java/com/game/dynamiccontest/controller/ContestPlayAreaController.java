@@ -9,6 +9,7 @@ import com.game.dynamiccontest.utils.ResponseConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/contests/{contestId}/play")
 public class ContestPlayAreaController {

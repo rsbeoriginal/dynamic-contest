@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/contests")
 public class ContestController {
@@ -38,6 +39,8 @@ public class ContestController {
 
     @PostMapping("/")
     public ResponseDTO<ContestDTO> add(@RequestBody RequestDTO<ContestDTO> requestDTO){
+
+        System.out.println("add: " + requestDTO);
 
         ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
         if(verifyUser(requestDTO.getUserId())) {

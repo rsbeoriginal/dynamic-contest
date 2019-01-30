@@ -4,7 +4,6 @@ import com.game.dynamiccontest.dto.*;
 import com.game.dynamiccontest.entity.ContestQuestion;
 import com.game.dynamiccontest.services.ContestQuestionService;
 import com.game.dynamiccontest.services.ContestService;
-import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/contest/{contestId}/questions")
 public class ContestQuestionController {
@@ -98,8 +98,8 @@ public class ContestQuestionController {
                     optionDTOList.add(optionDTO);
                     optionDTOList.add(optionDTO);
                     questionDetailDTO.setOptionDTOList(optionDTOList);
-                    questionDetailDTO.setName("WHat is this");
-                    questionDetailDTO.setContent("this is actual questions");
+                    questionDetailDTO.setQuestionName("WHat is this");
+                    questionDetailDTO.setQuestionContent("this is actual questions");
                     //TODO:REMOVE CODE
                     contestQuestionService.sendQuestionToFirebaseDatabase(contestId,""+contestQuestion.getQuestionSequence(),questionDetailDTO);
                 } catch (Exception e) {

@@ -26,9 +26,10 @@ public class ContestSubscriptionServiceImpl implements ContestSubscribeService {
             contest.setContestId(contestId);
             contestSubscribe.setContest(contest);
             contestSubscribe.setUserId(userId);
-            contestSubscribe.setFinished(false);
+            contestSubscribe.setFinished(new Boolean(false));
             contestSubscribe.setScore(0d);
             contestSubscribeRepository.save(contestSubscribe);
+//            System.out.println("finished: " + contestSubscribe.getFinished() + " : " + contestSubscribeRepository.save(contestSubscribe).getFinished());
         }else{
             throw new FailException("Already subscribed");
         }

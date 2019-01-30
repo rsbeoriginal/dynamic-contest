@@ -84,4 +84,19 @@ public class ContestPlayAreaDTO {
     public void setScore(Double score) {
         this.score = score;
     }
+
+    @Override
+    public String toString() {
+        return "ContestPlayAreaDTO{" +
+                "contestPlayAreaId='" + contestPlayAreaId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", contestId='" + contestId + '\'' +
+                ", questionId='" + questionId + '\'' +
+                ", questionSequence='" + questionSequence + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", answer='" + answer + '\'' +
+                ", score=" + score +
+                '}';
+    }
 }

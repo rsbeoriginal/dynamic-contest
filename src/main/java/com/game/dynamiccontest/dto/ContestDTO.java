@@ -47,4 +47,15 @@ public class ContestDTO {
     public void setActive(Boolean active) {
         this.active = active;
     }
+
+    @Override
+    public String toString() {
+        return "ContestDTO{" +
+                "contestId='" + contestId + '\'' +
+                ", contestName='" + contestName + '\'' +
+                ", type='" + type + '\'' +
+                ", startTime=" + startTime +
+                ", active=" + active +
+                '}';
+    }
 }

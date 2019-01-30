@@ -57,4 +57,16 @@ public class ContestQuestionDTO {
     public void setLast(Boolean last) {
         isLast = last;
     }
+
+    @Override
+    public String toString() {
+        return "ContestQuestionDTO{" +
+                "contestQuestionId='" + contestQuestionId + '\'' +
+                ", contest=" + contest +
+                ", questionId='" + questionId + '\'' +
+                ", questionSequence=" + questionSequence +
+                ", startTime=" + startTime +
+                ", isLast=" + isLast +
+                '}';
+    }
 }
