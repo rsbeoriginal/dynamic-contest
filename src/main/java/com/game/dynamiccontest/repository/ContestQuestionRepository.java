@@ -27,4 +27,6 @@ public interface ContestQuestionRepository extends CrudRepository<ContestQuestio
 //    void deleteContestQuestionByContestId(String contestId);
 
     void deleteContestQuestionByContest_ContestId(String contestId);
+
+    ContestQuestion findContestQuestionByContest_ContestIdAndQuestionSequence(String contestId, Integer questionSequence);
 }

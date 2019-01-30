@@ -12,5 +12,9 @@ public interface ContestQuestionService {
     int getNextQuestionNumber(String contestId);
     void deleteContestQuestionByContestId(String contestId);
 
-    void sendQuestionToFirebaseDatabase(String contestId, String questionSequence, QuestionDetailDTO questionDetailDTO);
+    void sendQuestionToFirebaseDatabase(String contestId, Integer questionSequence, QuestionDetailDTO questionDetailDTO);
+
+    ContestQuestion getContestQuestionBySequenceNumber(String contestId, Integer questionSequence);
+
+    void pushQuestion(long timestamp, String contestId, Integer questionSequence);
 }

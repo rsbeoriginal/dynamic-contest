@@ -87,21 +87,21 @@ public class ContestQuestionController {
                     ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
                     BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
 
-                    //TODO:DUMMY DATA
-                    QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
-                    questionDetailDTO.setQuestionId(""+contestQuestion.getQuestionSequence());
-                    OptionDTO optionDTO = new OptionDTO();
-                    optionDTO.setOptionContent("OPTION VALUE ");
-                    List<OptionDTO> optionDTOList = new ArrayList<>();
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    questionDetailDTO.setOptionDTOList(optionDTOList);
-                    questionDetailDTO.setName("WHat is this");
-                    questionDetailDTO.setContent("this is actual questions");
-                    //TODO:REMOVE CODE
-                    contestQuestionService.sendQuestionToFirebaseDatabase(contestId,""+contestQuestion.getQuestionSequence(),questionDetailDTO);
+//                    //TODO:DUMMY DATA
+//                    QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
+//                    questionDetailDTO.setQuestionId(""+contestQuestion.getQuestionSequence());
+//                    OptionDTO optionDTO = new OptionDTO();
+//                    optionDTO.setOptionContent("OPTION VALUE ");
+//                    List<OptionDTO> optionDTOList = new ArrayList<>();
+//                    optionDTOList.add(optionDTO);
+//                    optionDTOList.add(optionDTO);
+//                    optionDTOList.add(optionDTO);
+//                    optionDTOList.add(optionDTO);
+//                    questionDetailDTO.setOptionDTOList(optionDTOList);
+//                    questionDetailDTO.setName("WHat is this");
+//                    questionDetailDTO.setContent("this is actual questions");
+//                    //TODO:REMOVE CODE
+//                    contestQuestionService.sendQuestionToFirebaseDatabase(contestId,contestQuestion.getQuestionSequence(),questionDetailDTO);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -139,6 +139,11 @@ public class ContestQuestionController {
             responseDTO.setErrorMessage("Failed while retrieving Questions");
         }
         return  responseDTO;
+    }
+
+    @GetMapping("/test/{questionSequence}")
+    public ContestQuestion getQuestion(@PathVariable("contestId") String contestId, @PathVariable("questionSequence") Integer questionSequence){
+        return contestQuestionService.getContestQuestionBySequenceNumber(contestId, questionSequence);
     }
 
     private boolean verifyUser(String userId) {

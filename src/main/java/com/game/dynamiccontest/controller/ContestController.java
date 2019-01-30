@@ -2,8 +2,11 @@ package com.game.dynamiccontest.controller;
 
 import com.game.dynamiccontest.dto.*;
 import com.game.dynamiccontest.entity.Contest;
+import com.game.dynamiccontest.job.PushQuestion;
 import com.game.dynamiccontest.job.SendNotification;
+import com.game.dynamiccontest.services.ContestQuestionService;
 import com.game.dynamiccontest.services.ContestService;
+import com.game.dynamiccontest.services.Schedulers.PushScheduler;
 import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
 import org.quartz.*;
@@ -12,29 +15,21 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/contests")
 public class ContestController {
 
-//    @RequestMapping(value = "/createContest")
-//    public void createContest(){
-//        try{
-//            String cron = "0/10 55 19 * * ? *";
-//            JobDetail job = JobBuilder.newJob(SendNotification.class).build();
-//            Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
-//            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
-//            scheduler.start();
-//            scheduler.scheduleJob(job, trigger);
-//        } catch (SchedulerException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @Autowired
     ContestService contestService;
+
+    @Autowired
+    ContestQuestionService contestQuestionService;
 
     @PostMapping("/")
     public ResponseDTO<ContestDTO> add(@RequestBody RequestDTO<ContestDTO> requestDTO){
@@ -45,12 +40,20 @@ public class ContestController {
             BeanUtils.copyProperties(requestDTO.getRequest(), contest);
             try {
                 ContestDTO contestDTO = new ContestDTO();
+                contest.setStartTime(System.currentTimeMillis() + 1*60*1000);
                 BeanUtils.copyProperties(contestService.add(contest), contestDTO);
                 responseDTO.setStatus(ResponseConstants.SUCCESS);
                 responseDTO.setResponse(contestDTO);
 
                 //Schedule Notification
-                contestService.sendContestScheduleNotification(responseDTO.getResponse().getStartTime() - 1*60*1000);
+                contestService.sendContestScheduleNotification(contestDTO.getStartTime() - 1*30*1000);
+//                createContest(contest.getStartTime() - 1*60*1000);
+                contestQuestionService.pushQuestion(contest.getStartTime(), contest.getContestId(), 1);
+//                PushScheduler pushScheduler = new PushScheduler();
+//                pushScheduler.setContestId(contest.getContestId());
+//                pushScheduler.setQuestionSequence(1);
+//                pushScheduler.setCronExp(contest.getStartTime());
+//                pushScheduler.initializeScheduler();
 
             } catch (FailException e) {
                 responseDTO.setStatus(ResponseConstants.FAIL);
@@ -103,4 +106,50 @@ public class ContestController {
     private boolean verifyUser(String userId) {
         return true;
     }
+
+    //@RequestMapping(value = "/createContest")
+    public void createContest(long timestamp){
+        try{
+            Date date = new Date(timestamp);
+            SimpleDateFormat dateFormat = new SimpleDateFormat ("ss mm HH * * ? *");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+            String cron = dateFormat.format(date);
+            System.out.println(cron);
+//            String cron = "00 00 22 * * ? *";
+            JobDetail jobSendContestNotification = JobBuilder.newJob(SendNotification.class)
+                    .withIdentity("jobSendContestNotification", "groupSendContestNotification")
+                    .build();
+            Trigger triggerContestNotification = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron))
+                    .withIdentity("triggerContestNotification", "groupContestNotification")
+                    .build();
+            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.start();
+            scheduler.scheduleJob(jobSendContestNotification, triggerContestNotification);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public void pushQuestion(long timestamp, String contestId, Integer questionSequence){
+//        try{
+//            Date date = new Date(timestamp);
+//            SimpleDateFormat dateFormat = new SimpleDateFormat ("ss/10 mm HH * * ? *");
+//            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
+//            String cron = dateFormat.format(date);
+//            System.out.println(cron);
+//            JobDetail jobPushQuestionToFirebase = JobBuilder.newJob(PushQuestion.class)
+//                    .withIdentity("jobPushQuestionToFirebase", "groupPushQuestionToFirebase")
+//                    .build();
+//            Trigger triggerPushQuestionToFirebase = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron))
+//                    .withIdentity("triggerPushQuestionToFirebase", "groupPushQuestionToFirebase")
+//                    .build();
+//            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+//            scheduler.getContext().put("contestId", contestId);
+//            scheduler.getContext().put("questionSequence", questionSequence);
+//            scheduler.start();
+//            scheduler.scheduleJob(jobPushQuestionToFirebase, triggerPushQuestionToFirebase);
+//        } catch (SchedulerException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -45,16 +46,21 @@ public class ContestServiceImpl implements ContestService {
     public void sendContestScheduleNotification(long timestamp){
         try{
             Date date = new Date(timestamp);
-            SimpleDateFormat dateFormat =
-                    new SimpleDateFormat ("ss mm hh dd MM E yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat ("ss mm HH * * ? *");
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+05:30"));
-            //String cron = "0/10 55 19 * * ? *";
             String cron = dateFormat.format(date);
-            JobDetail job = JobBuilder.newJob(SendNotification.class).build();
-            Trigger trigger = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+            System.out.println(cron);
+            JobDetail jobSendContestNotification = JobBuilder.newJob(SendNotification.class)
+                    .withIdentity("jobSendContestNotification", "groupSendContestNotification")
+                    .build();
+            Trigger triggerContestNotification = TriggerBuilder.newTrigger().withSchedule(CronScheduleBuilder.cronSchedule(cron))
+                    .withIdentity("triggerContestNotification", "groupContestNotification")
+                    .build();
             Scheduler scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
-            scheduler.scheduleJob(job, trigger);
+            scheduler.scheduleJob(jobSendContestNotification, triggerContestNotification);
+//            HashMap<String, Object> contextVars= new HashMap<>();
+            //schedulerService.scheduleJob(SendNotification.class, "jobSendContestNotification", "groupSendContestNotification",cron, contextVars);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
