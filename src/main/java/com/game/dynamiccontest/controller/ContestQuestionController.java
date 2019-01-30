@@ -4,6 +4,7 @@ import com.game.dynamiccontest.dto.*;
 import com.game.dynamiccontest.entity.ContestQuestion;
 import com.game.dynamiccontest.services.ContestQuestionService;
 import com.game.dynamiccontest.services.ContestService;
+import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,42 +76,17 @@ public class ContestQuestionController {
         ResponseDTO<ContestQuestionDTO> responseDTO = new ResponseDTO<>();
 
         if(verifyUser(requestDTO.getUserId())) {
-            ContestQuestionDTO contestQuestionDTO = requestDTO.getRequest();
-            if(contestQuestionService.getContestQuestionById(contestId, contestQuestionDTO.getQuestionId()) == null) {
-                if (contestQuestionDTO.getContest() == null)
-                    contestQuestionDTO.setContest(contestService.getContestById(contestId));
-                ContestQuestion contestQuestion = new ContestQuestion();
-                BeanUtils.copyProperties(contestQuestionDTO, contestQuestion);
-                try {
-                    int questionSequence = contestQuestionService.getNextQuestionNumber(contestId);
-                    contestQuestion.setQuestionSequence(questionSequence + 1);
-                    ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
-                    BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
-
-                    //TODO:DUMMY DATA
-                    QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
-                    questionDetailDTO.setQuestionId(""+contestQuestion.getQuestionSequence());
-                    OptionDTO optionDTO = new OptionDTO();
-                    optionDTO.setOptionContent("OPTION VALUE ");
-                    List<OptionDTO> optionDTOList = new ArrayList<>();
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    optionDTOList.add(optionDTO);
-                    questionDetailDTO.setOptionDTOList(optionDTOList);
-                    questionDetailDTO.setQuestionName("WHat is this");
-                    questionDetailDTO.setQuestionContent("this is actual questions");
-                    //TODO:REMOVE CODE
-                    contestQuestionService.sendQuestionToFirebaseDatabase(contestId,""+contestQuestion.getQuestionSequence(),questionDetailDTO);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
+                BeanUtils.copyProperties(contestQuestionService.add(contestId,requestDTO.getRequest()), contestQuestionDTO1);
                 responseDTO.setStatus(ResponseConstants.SUCCESS);
-                responseDTO.setResponse(contestQuestionDTO);
-            }
-            else{
+                responseDTO.setResponse(contestQuestionDTO1);
+            }catch (FailException e){
                 responseDTO.setStatus(ResponseConstants.FAIL);
-                responseDTO.setErrorMessage("Error while adding questions");
+                responseDTO.setErrorMessage(e.getMessage());
+            }catch (Exception e){
+                responseDTO.setStatus(ResponseConstants.ERROR);
+                responseDTO.setErrorMessage(e.getMessage());
             }
         }
         else{
