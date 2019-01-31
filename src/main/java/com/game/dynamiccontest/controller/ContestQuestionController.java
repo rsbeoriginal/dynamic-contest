@@ -72,7 +72,7 @@ public class ContestQuestionController {
 
     @PostMapping("/")
     public ResponseDTO<ContestQuestionDTO> addQuestion(@RequestBody RequestDTO<ContestQuestionDTO> requestDTO, @PathVariable("contestId") String contestId){
-
+        System.out.println("add question: " + requestDTO.toString());
         ResponseDTO<ContestQuestionDTO> responseDTO = new ResponseDTO<>();
 
         if(verifyUser(requestDTO.getUserId())) {
@@ -93,6 +93,7 @@ public class ContestQuestionController {
             responseDTO.setStatus(ResponseConstants.FAIL);
             responseDTO.setErrorMessage("Auth Failed");
         }
+        System.out.println("add response " + responseDTO.toString());
         return responseDTO;
     }
 

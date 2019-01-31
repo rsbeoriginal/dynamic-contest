@@ -1,24 +1,31 @@
 package com.game.dynamiccontest.services.impl;
 
 import com.game.dynamiccontest.dto.ContestPlayAreaDTO;
-import com.game.dynamiccontest.dto.QuestionDetailDTO;
+import com.game.dynamiccontest.dto.SubmitContestDTO;
 import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.entity.ContestPlayArea;
 import com.game.dynamiccontest.entity.ContestQuestion;
 import com.game.dynamiccontest.entity.ContestSubscribe;
 import com.game.dynamiccontest.repository.ContestPlayAreaRepository;
 import com.game.dynamiccontest.repository.ContestQuestionRepository;
+import com.game.dynamiccontest.repository.ContestRepository;
 import com.game.dynamiccontest.repository.ContestSubscribeRepository;
 import com.game.dynamiccontest.services.ContestPlayAreaService;
 import com.game.dynamiccontest.services.ContestSubscribeService;
 import com.game.dynamiccontest.utils.FailException;
+import com.game.dynamiccontest.utils.MicroservicesURL;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = false,propagation = Propagation.REQUIRES_NEW)
@@ -34,7 +41,13 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
     ContestQuestionRepository contestQuestionRepository;
 
     @Autowired
+    ContestRepository contestRepository;
+
+    @Autowired
     ContestSubscribeService contestSubscribeService;
+
+    @Autowired
+    RestTemplate restTemplate;
 
 
     @Override
@@ -53,14 +66,21 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
         if(checkIfAlreadyExists(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getUserId(),contestPlayAreaDTO.getQuestionId())){
             ContestPlayArea contestPlayArea = new ContestPlayArea();
             BeanUtils.copyProperties(contestPlayAreaDTO,contestPlayArea);
-            contestPlayArea.setStartTime(getStartFromContest(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getQuestionId()));
+            contestPlayArea.setStartTime(getStartTimeFromContest(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getQuestionId()));
 
             //get long time
             Date date = new Date();
-            long time = date.getTime();
-            contestPlayArea.setEndTime(time);
+            long endTime = date.getTime();
+            contestPlayArea.setEndTime(endTime);
 
-            contestPlayArea.setScore(checkAnswer(contestPlayAreaDTO.getAnswer()));
+            //get Contest Question
+            ContestQuestion contestQuestion = contestQuestionRepository.findContestQuestionByContest_ContestIdAndQuestionId(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getQuestionId());
+            contestPlayArea.setQuestionSequence(contestQuestion.getQuestionSequence());
+            if(checkAnswerFromServer(contestPlayAreaDTO.getQuestionId(),contestPlayAreaDTO.getAnswer())) {
+                contestPlayArea.setScore(calculateScore(getStartTimeFromContest(contestPlayArea.getContestId(),contestPlayArea.getQuestionId()),endTime));
+            }else {
+                contestPlayArea.setScore(0d);
+            }
             contestPlayAreaRepository.save(contestPlayArea);
 
             //for last question
@@ -73,6 +93,12 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
         }
 
 
+    }
+
+    private Double calculateScore(Long startTime, Long endTime) {
+        Long diffTime = endTime - startTime;
+        Double score = MicroservicesURL.DYNAMIC_QUESTION_MARKS + Double.valueOf("0."+diffTime);
+        return score;
     }
 
     private boolean checkLastQuestion(String contestId, String questionId) {
@@ -98,18 +124,63 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
         contestSubscribe.setFinished(true);
         contestSubscribeRepository.save(contestSubscribe);
         System.out.println("score: " + totalScore);
+        try{
+            SubmitContestDTO submitContestDTO = new SubmitContestDTO();
+            submitContestDTO.setContestId(contestSubscribe.getContest().getContestId());
+            submitContestDTO.setContestName(contestRepository.findOne(contestId).getContestName());
+            submitContestDTO.setScore(contestSubscribe.getScore());
+            submitContestDTO.setUserId(contestSubscribe.getUserId());
+            submitContest(submitContestDTO);
+        }catch (Exception e){
+            System.out.println("submit contest -> REPORTING exception : " + e.getMessage());
+        }
     }
 
-    //TODO:CHECK CORRECT ANSWER
-    private Double checkAnswer(String answer) {
-        return 0d;
+    @Override
+    public String getQuestionWinner(String contestId, String questionId) throws FailException{
+        List<ContestPlayArea> userList = contestPlayAreaRepository.getWinnerbyContestIdAndQuestionId(contestId, questionId);
+        try{
+            return userList.get(0).getUserId();
+        }catch (Exception e) {
+            throw new FailException("No winner");
+        }
     }
 
-    private Long getStartFromContest(String contestId, String questionId) {
+
+    public boolean checkAnswerFromServer(String questionId,String optionIds)
+    {
+        String URL=MicroservicesURL.SCREENED_QUESTION_BASE_URL+ MicroservicesURL.CHECK_ANSWER;
+        HashMap<String,String> hash=new HashMap<>();
+        hash.put("questionId",questionId);
+        hash.put("userAnswer",optionIds);
+        HttpEntity<HashMap<String,String>> request=new HttpEntity<>(hash,null);
+        ResponseEntity<Boolean> response=restTemplate.postForEntity(URL,request,Boolean.class);
+        System.out.println(response.getBody());
+        return response.getBody();
+    }
+
+    private Long getStartTimeFromContest(String contestId, String questionId) {
         return contestQuestionRepository.getStartTimeByQuestion(contestId,questionId);
     }
 
     private boolean checkIfAlreadyExists(String contestId, String userId, String questionId) {
         return (contestPlayAreaRepository.checkAlreadyExists(contestId,userId,questionId)==0);
     }
+
+//    private void findWinnerByContestAndQuestion(String contestId,String questionId){
+//        String userId = contestPlayAreaRepository.getWinnerbyContestIdAndQuestionId(contestId,questionId);
+//        System.out.println("" + userId);
+//    }
+//
+//    private void findContestWinner(String contestId){
+//        String userId = contestSubscribeRepository.getWinnerByContestId(contestId);
+//    }
+
+    public String submitContest(SubmitContestDTO submitContestDTO) {
+        String URL = MicroservicesURL.REPORTING_BASE_URL + MicroservicesURL.ADD_TO_LEADERBOARD;
+        ResponseEntity<String> response = restTemplate.postForEntity(URL, submitContestDTO, String.class);
+        return response.getBody();
+    }
+
+
 }

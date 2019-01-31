@@ -5,6 +5,7 @@ import com.game.dynamiccontest.dto.QuestionDetailDTO;
 import com.game.dynamiccontest.dto.RequestDTO;
 import com.game.dynamiccontest.dto.ResponseDTO;
 import com.game.dynamiccontest.services.ContestPlayAreaService;
+import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +60,22 @@ public class ContestPlayAreaController {
         }else{
             responseDTO.setStatus(ResponseConstants.FAIL);
             responseDTO.setResponse("Auth fail");
+        }
+        return responseDTO;
+    }
+
+    @GetMapping("/question/{questionId}/winner")
+    public ResponseDTO<String> getDynamicQuetionWinner(@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId){
+        ResponseDTO<String> responseDTO = new ResponseDTO<>();
+        try{
+            responseDTO.setResponse(contestPlayAreaService.getQuestionWinner(contestId,questionId));
+            responseDTO.setStatus(ResponseConstants.SUCCESS);
+        }catch (FailException e){
+            responseDTO.setStatus(ResponseConstants.FAIL);
+            responseDTO.setErrorMessage(e.getMessage());
+        }catch (Exception e){
+            responseDTO.setStatus(ResponseConstants.ERROR);
+            responseDTO.setErrorMessage(e.getMessage());
         }
         return responseDTO;
     }

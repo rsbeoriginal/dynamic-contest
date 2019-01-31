@@ -8,5 +8,8 @@ public interface ContestPlayAreaService {
     void submitAnswer(ContestPlayAreaDTO request) throws FailException;
 
     void finishContest(String contestId, String userId);
+
+    String getQuestionWinner(String contestId, String questionId) throws FailException;
+
 //    QuestionDetailDTO getNextQuestion();
 }

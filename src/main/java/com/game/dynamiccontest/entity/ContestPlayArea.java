@@ -20,7 +20,7 @@ public class ContestPlayArea {
     private String userId;
     private String contestId;
     private String questionId;
-    private String questionSequence;
+    private Integer questionSequence;
     private Long startTime;
     private Long endTime;
     private String answer;
@@ -62,11 +62,11 @@ public class ContestPlayArea {
         this.questionId = questionId;
     }
 
-    public String getQuestionSequence() {
+    public Integer getQuestionSequence() {
         return questionSequence;
     }
 
-    public void setQuestionSequence(String questionSequence) {
+    public void setQuestionSequence(Integer questionSequence) {
         this.questionSequence = questionSequence;
     }
 

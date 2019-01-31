@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -25,12 +26,17 @@ public class AppConfig {
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://test-1d656.firebaseio.com")
+                .setDatabaseUrl("https://notification-6bc99.firebaseio.com/")
                 .build();
 
         FirebaseApp.initializeApp(options);
         System.out.println("Firebase: " + FirebaseApp.getInstance().getName());
         return FirebaseApp.getInstance();
+    }
+
+    @Bean
+    public RestTemplate setupRestTemplate(){
+        return new RestTemplate();
     }
 
     @Bean

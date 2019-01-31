@@ -3,6 +3,7 @@ package com.game.dynamiccontest.controller;
 import com.game.dynamiccontest.dto.ContestSubscriptionDTO;
 import com.game.dynamiccontest.dto.RequestDTO;
 import com.game.dynamiccontest.dto.ResponseDTO;
+import com.game.dynamiccontest.dto.ResponseListDTO;
 import com.game.dynamiccontest.services.ContestSubscribeService;
 import com.game.dynamiccontest.utils.FailException;
 import com.game.dynamiccontest.utils.ResponseConstants;
@@ -39,6 +40,22 @@ public class ContestSubscriptionController {
             responseDTO.setErrorMessage("Auth failed");
         }
         return responseDTO;
+    }
+
+    @GetMapping("/leaderboard")
+    public ResponseListDTO<ContestSubscriptionDTO> getLeaderboard(@PathVariable("contestId") String contestId){
+        ResponseListDTO<ContestSubscriptionDTO> responseListDTO = new ResponseListDTO<>();
+        try{
+            responseListDTO.setResponse(contestSubscribeService.getLearboard(contestId));
+            responseListDTO.setStatus(ResponseConstants.SUCCESS);
+        }catch (FailException e){
+            responseListDTO.setStatus(ResponseConstants.FAIL);
+            responseListDTO.setErrorMessage(e.getMessage());
+        }catch (Exception e){
+            responseListDTO.setStatus(ResponseConstants.ERROR);
+            responseListDTO.setErrorMessage(e.getMessage());
+        }
+        return responseListDTO;
     }
 
     private boolean verifyUser(String userId) {

@@ -1,6 +1,7 @@
 package com.game.dynamiccontest.services.impl;
 
 import com.game.dynamiccontest.dto.ContestQuestionDTO;
+import com.game.dynamiccontest.dto.DynamicQuestionDTO;
 import com.game.dynamiccontest.dto.OptionDTO;
 import com.game.dynamiccontest.dto.QuestionDetailDTO;
 import com.game.dynamiccontest.entity.ContestQuestion;
@@ -8,16 +9,22 @@ import com.game.dynamiccontest.repository.ContestQuestionRepository;
 import com.game.dynamiccontest.services.ContestQuestionService;
 import com.game.dynamiccontest.services.ContestService;
 import com.game.dynamiccontest.utils.FailException;
+import com.game.dynamiccontest.utils.MicroservicesURL;
 import com.game.dynamiccontest.utils.ResponseConstants;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -29,6 +36,9 @@ public class ContestQuestionServiceImpl implements ContestQuestionService {
 
     @Autowired
     ContestService contestService;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     @Override
     @Transactional(readOnly = false)
@@ -45,6 +55,11 @@ public class ContestQuestionServiceImpl implements ContestQuestionService {
                 contestQuestion.setQuestionSequence(questionSequence + 1);
                 ContestQuestionDTO contestQuestionDTO1 = new ContestQuestionDTO();
 //                BeanUtils.copyProperties(contestQuestionService.add(contestQuestion), contestQuestionDTO1);
+
+                //TODO:DATE_TIME AS PER QS SUBMIT
+                Date date = new Date();
+                contestQuestion.setStartTime(date.getTime());
+
                 contestQuestionCreated =  contestQuestionRepository.save(contestQuestion);
 
                 //TODO:DUMMY DATA
@@ -61,7 +76,7 @@ public class ContestQuestionServiceImpl implements ContestQuestionService {
                 questionDetailDTO.setQuestionName("WHat is this");
                 questionDetailDTO.setQuestionContent("this is actual questions");
                 //TODO:REMOVE CODE
-                sendQuestionToFirebaseDatabase(contestId,""+contestQuestion.getQuestionSequence(),questionDetailDTO);
+                sendQuestionToFirebaseDatabase(contestId,contestQuestion.getQuestionId(),contestQuestion.getQuestionSequence(),contestQuestion.getLast());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -93,13 +108,39 @@ public class ContestQuestionServiceImpl implements ContestQuestionService {
         contestQuestionRepository.deleteContestQuestionByContest_ContestId(contestId);
     }
 
-    @Override
-    public void sendQuestionToFirebaseDatabase(String contestId, String questionSequence, QuestionDetailDTO questionDetailDTO) {
+
+    public void sendQuestionToFirebaseDatabase(String contestId, String questionId, Integer questionSequence, Boolean last) {
+
+        if(questionSequence == 1) {
+            DatabaseReference currentQuestionRef = FirebaseDatabase.getInstance().getReference().child("Dynamic_Contest")
+                    .child(contestId).child("currentQuestion");
+            currentQuestionRef.setValueAsync(questionSequence);
+        }
+
+        QuestionDetailDTO questionDetailDTO = getQuestionFromServer(questionId);
+        DynamicQuestionDTO dynamicQuestionDTO = new DynamicQuestionDTO();
+        dynamicQuestionDTO.setQuestionDetail(questionDetailDTO);
+        dynamicQuestionDTO.setLast(last);
+        dynamicQuestionDTO.setQuestionSequence(questionSequence);
+
+
         DatabaseReference ref=FirebaseDatabase.getInstance().getReference().child("Dynamic_Contest")
                 .child(contestId)
+                .child("questions")
                 .child("" + questionSequence);
-        ref.setValueAsync(questionDetailDTO);
+        ref.setValueAsync(dynamicQuestionDTO);
     }
+
+    public QuestionDetailDTO getQuestionFromServer(String questionId)
+    {
+        String URL=MicroservicesURL.SCREENED_QUESTION_BASE_URL + MicroservicesURL.GET_QUESTION_BY_ID +questionId;
+        System.out.println("url getQuestionById: " + URL);
+        ResponseEntity<QuestionDetailDTO> response = restTemplate.getForEntity(URL, QuestionDetailDTO.class);
+        System.out.println(response.getBody());
+        return response.getBody();
+
+    }
+
 
 
 }

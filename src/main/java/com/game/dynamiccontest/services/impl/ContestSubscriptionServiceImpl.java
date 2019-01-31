@@ -1,14 +1,19 @@
 package com.game.dynamiccontest.services.impl;
 
+import com.game.dynamiccontest.dto.ContestSubscriptionDTO;
 import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.entity.ContestSubscribe;
 import com.game.dynamiccontest.repository.ContestSubscribeRepository;
 import com.game.dynamiccontest.services.ContestSubscribeService;
 import com.game.dynamiccontest.utils.FailException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true,propagation = Propagation.REQUIRES_NEW)
@@ -34,6 +39,22 @@ public class ContestSubscriptionServiceImpl implements ContestSubscribeService {
             throw new FailException("Already subscribed");
         }
         return contestSubscribe;
+    }
+
+    @Override
+    public List<ContestSubscriptionDTO> getLearboard(String contestId) throws FailException {
+        List<ContestSubscribe> contestSubscribeList = contestSubscribeRepository.getLeaderboard(contestId);
+        List<ContestSubscriptionDTO> contestSubscriptionDTOList = new ArrayList<>();
+        if(contestSubscribeList!=null){
+            for(int i=0;i<contestSubscribeList.size();i++){
+                ContestSubscriptionDTO contestSubscriptionDTO = new ContestSubscriptionDTO();
+                BeanUtils.copyProperties(contestSubscribeList.get(i),contestSubscriptionDTO);
+                contestSubscriptionDTOList.add(contestSubscriptionDTO);
+            }
+            return contestSubscriptionDTOList;
+        }else{
+            throw new FailException("No winners");
+        }
     }
 
     private boolean checkIfAlreadySubscribed(String contestId, String userId) {
