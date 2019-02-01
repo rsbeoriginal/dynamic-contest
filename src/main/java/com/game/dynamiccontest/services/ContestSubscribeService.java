@@ -11,4 +11,6 @@ public interface ContestSubscribeService {
     ContestSubscribe subscribeToContest(String contestId, String userId) throws FailException;
 
     List<ContestSubscriptionDTO> getLearboard(String contestId) throws FailException;
+
+    ContestSubscriptionDTO getLearboardByUserId(String contestId, String userId) throws FailException;
 }

@@ -11,4 +11,6 @@ public interface ContestService {
     List<Contest> getAll() throws Exception;
 
     Contest getContestById(String contestId);
+
+    Contest getActiveContest() throws FailException;
 }

@@ -94,10 +94,30 @@ public class ContestController {
             responseDTO.setStatus(ResponseConstants.SUCCESS);
         }catch (Exception e){
             responseDTO.setStatus(ResponseConstants.ERROR);
-            responseDTO.setStatus(e.getMessage());
+            responseDTO.setErrorMessage(e.getMessage());
         }
         return responseDTO;
     }
+
+    @GetMapping("/active")
+    public ResponseDTO<ContestDTO> getActiveContest(){
+        System.out.println("active contest");
+        ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+        try {
+            ContestDTO contestDTO = new ContestDTO();
+            BeanUtils.copyProperties(contestService.getActiveContest(),contestDTO);
+            responseDTO.setResponse(contestDTO);
+            responseDTO.setStatus(ResponseConstants.SUCCESS);
+        }catch (FailException e){
+            responseDTO.setStatus(ResponseConstants.FAIL);
+            responseDTO.setErrorMessage(e.getMessage());
+        }catch (Exception e){
+            responseDTO.setStatus(ResponseConstants.ERROR);
+            responseDTO.setErrorMessage(e.getMessage());
+        }
+        return responseDTO;
+    }
+
 
     private boolean verifyUser(String userId) {
         return true;

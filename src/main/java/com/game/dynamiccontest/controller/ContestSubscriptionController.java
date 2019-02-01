@@ -58,6 +58,22 @@ public class ContestSubscriptionController {
         return responseListDTO;
     }
 
+    @GetMapping("/leaderboard/{userId}")
+    public ResponseDTO<ContestSubscriptionDTO> getLeaderboardbyUserId(@PathVariable("contestId") String contestId,@PathVariable("userId") String userId){
+        ResponseDTO<ContestSubscriptionDTO> responseDTO = new ResponseDTO<>();
+        try{
+            responseDTO.setResponse(contestSubscribeService.getLearboardByUserId(contestId,userId));
+            responseDTO.setStatus(ResponseConstants.SUCCESS);
+        }catch (FailException e){
+            responseDTO.setStatus(ResponseConstants.FAIL);
+            responseDTO.setErrorMessage(e.getMessage());
+        }catch (Exception e){
+            responseDTO.setStatus(ResponseConstants.ERROR);
+            responseDTO.setErrorMessage(e.getMessage());
+        }
+        return responseDTO;
+    }
+
     private boolean verifyUser(String userId) {
         return true;
     }

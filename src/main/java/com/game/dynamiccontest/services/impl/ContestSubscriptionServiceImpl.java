@@ -57,6 +57,18 @@ public class ContestSubscriptionServiceImpl implements ContestSubscribeService {
         }
     }
 
+    @Override
+    public ContestSubscriptionDTO getLearboardByUserId(String contestId, String userId) throws FailException {
+        ContestSubscribe contestSubscribe = contestSubscribeRepository.getContestbyUserId(contestId,userId);
+        if(contestSubscribe!=null){
+            ContestSubscriptionDTO contestSubscriptionDTO = new ContestSubscriptionDTO();
+            BeanUtils.copyProperties(contestSubscribe,contestSubscriptionDTO);
+            return contestSubscriptionDTO;
+        }else{
+            throw new FailException("No winners");
+        }
+    }
+
     private boolean checkIfAlreadySubscribed(String contestId, String userId) {
         return (contestSubscribeRepository.checkContest(contestId,userId)==0);
     }

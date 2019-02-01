@@ -2,6 +2,7 @@ package com.game.dynamiccontest.services.impl;
 
 import com.game.dynamiccontest.dto.ContestPlayAreaDTO;
 import com.game.dynamiccontest.dto.SubmitContestDTO;
+import com.game.dynamiccontest.dto.SubmitQuestionReportDTO;
 import com.game.dynamiccontest.entity.Contest;
 import com.game.dynamiccontest.entity.ContestPlayArea;
 import com.game.dynamiccontest.entity.ContestQuestion;
@@ -83,6 +84,9 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
             }
             contestPlayAreaRepository.save(contestPlayArea);
 
+            //send info for reporting
+            sendQuestionResponseForReporting(contestPlayArea);
+
             //for last question
             if(checkLastQuestion(contestPlayAreaDTO.getContestId(),contestPlayAreaDTO.getQuestionId())){
                 finishContest(contestPlayAreaDTO.getContestId(),contestPlayArea.getUserId());
@@ -93,6 +97,18 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
         }
 
 
+    }
+
+    private void sendQuestionResponseForReporting(ContestPlayArea contestPlayArea) {
+        SubmitQuestionReportDTO  submitQuestionReportDTO = new SubmitQuestionReportDTO();
+        submitQuestionReportDTO.setQuestionId(contestPlayArea.getQuestionId());
+        if(contestPlayArea.getScore()>0){
+            submitQuestionReportDTO.setCorrectResponse(true);
+        }else {
+            submitQuestionReportDTO.setCorrectResponse(false);
+        }
+        Thread thread = new Thread(new ReportQuestionThread(submitQuestionReportDTO));
+        thread.start();
     }
 
     private Double calculateScore(Long startTime, Long endTime) {
@@ -183,4 +199,19 @@ public class ContestPlayAreaServiceImpl implements ContestPlayAreaService {
     }
 
 
+    private class ReportQuestionThread implements Runnable {
+
+        SubmitQuestionReportDTO submitQuestionReportDTO;
+
+        public ReportQuestionThread(SubmitQuestionReportDTO submitQuestionReportDTO) {
+            this.submitQuestionReportDTO = submitQuestionReportDTO;
+        }
+
+        @Override
+        public void run() {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.postForEntity(MicroservicesURL.REPORTING_BASE_URL + MicroservicesURL.QUESTION_SUBMIT_REPORTING,submitQuestionReportDTO,String.class);
+            System.out.println("REPORTING question submit: " + response.getBody());
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -18,6 +19,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @Configuration
 @EnableSwagger2
+@ComponentScan(basePackages = {"com.contest.notificationProducer"})
 public class AppConfig {
     @Bean
     public FirebaseApp setupFirebase() throws IOException {
